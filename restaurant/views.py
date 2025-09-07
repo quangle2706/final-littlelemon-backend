@@ -9,6 +9,12 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
+from rest_framework.decorators import api_view
+from rest_framework import generics
+from .serializers import BookingSerializer, UserSerializer
+from rest_framework import viewsets, permissions
+from django.contrib.auth.models import User
+
 
 # Create your views here.
 def home(request):
@@ -64,5 +70,21 @@ def bookings(request):
     bookings = Booking.objects.all().filter(reservation_date=date)
     booking_json = serializers.serialize('json', bookings)
     return HttpResponse(booking_json, content_type='application/json')
+
+
+# API Views
+class BookingsView(generics.ListCreateAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+class BookingDetailView(generics.RetrieveDestroyAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
 
 
